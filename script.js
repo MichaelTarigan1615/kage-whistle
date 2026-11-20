@@ -11,7 +11,12 @@
   const hudEnergyBar = document.getElementById('hudEnergyBar');
   const hudEnergyText = document.getElementById('hudEnergyText');
   const hudScore = document.getElementById('hudScore');
+  const hudOrbsProgress = document.getElementById('hudOrbsProgress');
   const hudTimer = document.getElementById('hudTimer');
+  const btnToggleMicMobile = document.getElementById('btnToggleMicMobile');
+  const micDotMobile = document.getElementById('micDotMobile');
+  const micLabelMobile = document.getElementById('micLabelMobile');
+  const btnPauseMobile = document.getElementById('btnPauseMobile');
   const shadowDot = document.getElementById('shadowDot');
   const shadowStatusText = document.getElementById('shadowStatusText');
   const whistleLivePill = document.getElementById('whistleLivePill');
@@ -676,9 +681,13 @@
     if (audio.micActive) {
       micDot.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]';
       micLabel.textContent = 'Mic Aktif';
+      micDotMobile.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]';
+      micLabelMobile.textContent = 'Aktif';
     } else {
       micDot.className = 'w-2 h-2 rounded-full bg-slate-400';
       micLabel.textContent = 'Mic Mati';
+      micDotMobile.className = 'w-2 h-2 rounded-full bg-slate-400';
+      micLabelMobile.textContent = 'Mic';
       whistleLivePill.classList.add('hidden');
     }
   }
@@ -846,6 +855,7 @@
     hudLevel.textContent = (idx + 1) + '/' + LEVELS.length;
     levelNameFooter.textContent = tpl.name;
     hudScore.textContent = '0';
+    hudOrbsProgress.textContent = `0/${state.orbs.length}`;
     hudTimer.textContent = '00:00';
     updateEnergyUI();
   }
@@ -1058,6 +1068,8 @@
         orb.collected = true;
         state.levelScore += 100;
         hudScore.textContent = String(state.levelScore);
+        const collectedCount = state.orbs.filter(o => o.collected).length;
+        hudOrbsProgress.textContent = `${collectedCount}/${state.orbs.length}`;
         sfxOrb();
         spawnParticles(orb.x, orb.y, '#7dd3fc', 14);
       }
@@ -1592,6 +1604,11 @@
   });
 
   btnPause.addEventListener('click', pauseGame);
+  btnPauseMobile.addEventListener('click', pauseGame);
+  btnToggleMicMobile.addEventListener('click', async () => {
+    if (audio.micActive) stopMicrophone();
+    else await startMicrophone();
+  });
   btnResumeGame.addEventListener('click', resumeGame);
   btnPauseRestart.addEventListener('click', () => {
     pauseOverlay.classList.add('hidden');

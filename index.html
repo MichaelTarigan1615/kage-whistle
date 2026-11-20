@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Kage Whistle</title>
   <script src="https://cdn.tailwindcss.com/3.4.17"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -12,6 +12,7 @@
     * { box-sizing: border-box; }
     html, body {
       height: 100%;
+      height: 100dvh;
       width: 100%;
       margin: 0;
       padding: 0;
@@ -61,98 +62,108 @@
     }
   </style>
 </head>
-<body class="relative w-screen h-screen overflow-hidden bg-[#060b11]">
+<body class="relative w-screen h-[100dvh] overflow-hidden bg-[#060b11]">
 
   <!-- 100% Full-Screen Edge-to-Edge Game Canvas -->
   <div id="canvasContainer" class="fixed inset-0 w-full h-full">
     <canvas id="gameCanvas"></canvas>
   </div>
 
-  <!-- Minimal Floating In-Game HUD (Hidden on Homescreen & Loading) -->
-  <div id="inGameHud" class="hidden fixed inset-0 pointer-events-none z-20 p-4 sm:p-5 flex flex-col justify-between">
+  <!-- Minimal Floating In-Game HUD (Responsive Desktop + Mobile) -->
+  <div id="inGameHud" class="hidden fixed inset-0 pointer-events-none z-20 p-3 sm:p-5 flex flex-col justify-between">
     <!-- Top Floating Row -->
-    <div class="flex items-start justify-between gap-3">
-      <!-- Top-Left: Level, Energy, Orbs, Timer & Shadow Status -->
-      <div class="flex flex-col gap-2">
-        <div class="glass-hud rounded-full px-3.5 py-2 flex items-center gap-3 sm:gap-3.5 shadow-lg">
-          <div class="text-xs font-semibold text-emerald-300">
+    <div class="flex flex-wrap items-start justify-between gap-2">
+      <!-- Top-Left: Compact Level, Energy, Orbs, Timer & Shadow Status -->
+      <div class="flex flex-col gap-1.5 max-w-full">
+        <div class="glass-hud rounded-full px-3 py-1.5 sm:px-3.5 sm:py-2 flex items-center gap-2 sm:gap-3 shadow-lg">
+          <div class="text-[11px] sm:text-xs font-semibold text-emerald-300 shrink-0">
             <span id="hudLevel">1/3</span>
           </div>
-          <div class="flex items-center gap-2">
-            <div class="w-24 sm:w-32 h-2 bg-white/10 rounded-full overflow-hidden">
+          <div class="flex items-center gap-1.5">
+            <div class="w-16 sm:w-28 h-2 bg-white/10 rounded-full overflow-hidden">
               <div id="hudEnergyBar" class="h-full bg-gradient-to-r from-emerald-400 to-sky-400 transition-all duration-100 rounded-full" style="width: 100%"></div>
             </div>
-            <span id="hudEnergyText" class="text-[11px] font-mono text-white/85 w-8 text-right">100%</span>
+            <span id="hudEnergyText" class="text-[10px] sm:text-[11px] font-mono text-white/85 w-7 sm:w-8 text-right">100%</span>
           </div>
-          <div class="flex items-center gap-1 text-xs font-semibold text-amber-300" title="Gema Terkumpul">
+          <div class="flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-amber-300 shrink-0" title="Gema Terkumpul">
             <span class="w-2 h-2 rounded-full bg-sky-300 shadow-[0_0_8px_#7dd3fc]"></span>
             <span id="hudScore">0</span>
           </div>
-          <div class="text-[11px] font-mono text-white/75 border-l border-white/15 pl-2.5" title="Waktu Tempuh">
+          <div class="text-[10px] sm:text-[11px] font-mono text-white/75 border-l border-white/15 pl-2 shrink-0" title="Waktu Tempuh">
             <span id="hudTimer">00:00</span>
           </div>
         </div>
 
-        <div class="flex items-center gap-2">
-          <div id="shadowStatusPill" class="glass-hud px-3 py-1 rounded-full text-[11px] font-medium text-emerald-200 inline-flex items-center gap-1.5 w-fit">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <div id="shadowStatusPill" class="glass-hud px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-medium text-emerald-200 inline-flex items-center gap-1.5 w-fit">
             <span id="shadowDot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
             <span id="shadowStatusText">Teduh: Bayangan Pohon</span>
           </div>
-          <div id="whistleLivePill" class="hidden glass-hud px-2.5 py-1 rounded-full text-[11px] font-medium text-sky-200 inline-flex items-center gap-1.5">
+          <div id="whistleLivePill" class="hidden glass-hud px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-medium text-sky-200 inline-flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>
             <span id="whistleLiveText">Siulan</span>
           </div>
         </div>
       </div>
 
-      <!-- Top-Right: Minimal Translucent Icon Controls -->
-      <div class="pointer-events-auto flex items-center gap-2">
-        <button id="btnToggleMic" type="button" class="glass-hud hover:bg-white/15 px-3 py-2 rounded-full text-xs font-medium text-white/90 inline-flex items-center gap-2 transition" title="Aktifkan/Matikan Mikrofon">
+      <!-- Top-Right: Compact Translucent Controls (Never Clips on Mobile) -->
+      <div class="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
+        <button id="btnToggleMic" type="button" class="glass-hud hover:bg-white/15 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-full text-[11px] sm:text-xs font-medium text-white/90 inline-flex items-center gap-1.5 transition shrink-0" title="Aktifkan/Matikan Mikrofon">
           <span id="micDot" class="w-2 h-2 rounded-full bg-slate-400"></span>
           <span id="micLabel">Mic</span>
         </button>
-        <button id="btnMute" type="button" class="glass-hud hover:bg-white/15 w-9 h-9 rounded-full flex items-center justify-center text-white/85 transition" title="Efek Suara">
-          <svg id="iconSfxOn" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="btnMute" type="button" class="glass-hud hover:bg-white/15 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-white/85 transition shrink-0" title="Efek Suara">
+          <svg id="iconSfxOn" class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
             <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
             <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
           </svg>
-          <svg id="iconSfxOff" class="hidden w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg id="iconSfxOff" class="hidden w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
             <line x1="23" y1="9" x2="17" y2="15"/>
             <line x1="17" y1="9" x2="23" y2="15"/>
           </svg>
         </button>
-        <button id="btnPause" type="button" class="glass-hud hover:bg-white/15 w-9 h-9 rounded-full flex items-center justify-center text-white/85 transition" title="Jeda (Esc)">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="btnPause" type="button" class="glass-hud hover:bg-white/15 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-white/85 transition shrink-0" title="Jeda (Esc)">
+          <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <rect x="6" y="4" width="4" height="16" rx="1"/>
             <rect x="14" y="4" width="4" height="16" rx="1"/>
           </svg>
         </button>
-        <button id="btnRestart" type="button" class="glass-hud hover:bg-white/15 w-9 h-9 rounded-full flex items-center justify-center text-white/85 transition" title="Ulang Level">
+        <button id="btnRestart" type="button" class="hidden sm:flex glass-hud hover:bg-white/15 w-9 h-9 rounded-full items-center justify-center text-white/85 transition shrink-0" title="Ulang Level">
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
             <path d="M3 3v5h5"/>
           </svg>
         </button>
-        <button id="btnHelp" type="button" class="glass-hud hover:bg-white/15 w-9 h-9 rounded-full flex items-center justify-center text-white/85 text-xs font-bold transition" title="Panduan">
+        <button id="btnHelp" type="button" class="hidden sm:flex glass-hud hover:bg-white/15 w-9 h-9 rounded-full items-center justify-center text-white/85 text-xs font-bold transition shrink-0" title="Panduan">
           ?
         </button>
       </div>
     </div>
 
-    <!-- Bottom Floating Row -->
-    <div class="flex items-end justify-between">
-      <div id="levelNameFooter" class="text-[11px] font-medium text-white/50 tracking-wider uppercase px-1">
-        Level 1 • Rimba Pagi
+    <!-- Bottom Floating Row: Device-Adaptive Controls -->
+    <div class="flex flex-col gap-2 pb-1">
+      <!-- Mobile/Touch Thumb Direction Controls (Auto-shown ONLY on touch/mobile devices) -->
+      <div id="mobileTouchControls" class="hidden pointer-events-auto flex items-center justify-between gap-3 w-full">
+        <button id="ctrlFaceLeft" type="button" class="glass-hud active:scale-95 flex-1 max-w-[165px] py-3.5 px-4 rounded-2xl text-sm font-semibold text-white/85 flex items-center justify-center gap-2 shadow-lg transition">
+          <span class="text-base">&larr;</span>
+          <span>Hadap Kiri</span>
+        </button>
+        <button id="ctrlFaceRight" type="button" class="facing-pill-active glass-hud active:scale-95 flex-1 max-w-[165px] py-3.5 px-4 rounded-2xl text-sm font-semibold text-white/85 flex items-center justify-center gap-2 shadow-lg transition">
+          <span>Hadap Kanan</span>
+          <span class="text-base">&rarr;</span>
+        </button>
       </div>
-      <div class="pointer-events-auto flex items-center gap-1.5">
-        <button id="ctrlFaceLeft" type="button" class="glass-hud hover:bg-white/15 px-3 py-1.5 rounded-full text-xs font-medium text-white/75 transition" title="Hadap Kiri (A)">
-          &larr; A
-        </button>
-        <button id="ctrlFaceRight" type="button" class="facing-pill-active glass-hud hover:bg-white/15 px-3 py-1.5 rounded-full text-xs font-medium text-white/75 transition" title="Hadap Kanan (D)">
-          D &rarr;
-        </button>
+
+      <!-- Subtle Bottom Caption Row -->
+      <div class="flex items-center justify-between px-1">
+        <div id="levelNameFooter" class="text-[10px] sm:text-[11px] font-medium text-white/50 tracking-wider uppercase">
+          Level 1 • Rimba Pagi
+        </div>
+        <div id="desktopFacingHint" class="hidden sm:block text-[11px] font-medium text-white/45 tracking-wide">
+          A / D • Arah Pandang
+        </div>
       </div>
     </div>
   </div>
@@ -409,13 +420,28 @@
 
       const ctrlFaceLeft = document.getElementById('ctrlFaceLeft');
       const ctrlFaceRight = document.getElementById('ctrlFaceRight');
+      const mobileTouchControls = document.getElementById('mobileTouchControls');
+      const desktopFacingHint = document.getElementById('desktopFacingHint');
 
-      // Wide Full-Viewport Logical Coordinates
+      // Wide Full-Viewport Logical Coordinates + Uniform Aspect-Ratio Camera
       const WORLD_W = 1440;
       const WORLD_H = 720;
       const GROUND_Y = 648;
-      let scaleX = 1;
-      let scaleY = 1;
+      const cam = {
+        scale: 1,
+        x: 0,
+        offsetY: 0,
+        viewW: WORLD_W,
+        viewH: WORLD_H
+      };
+
+      function detectDeviceUI() {
+        const isTouch = window.matchMedia('(pointer: coarse)').matches ||
+          ('ontouchstart' in window) ||
+          window.innerWidth < 768;
+        mobileTouchControls.classList.toggle('hidden', !isTouch);
+        desktopFacingHint.classList.toggle('hidden', isTouch);
+      }
 
       // --- 3 Atmospheric Forest Levels ---
       const LEVELS = [
@@ -1161,6 +1187,7 @@
         state.particles = [];
 
         setFacing(1);
+        cam.x = 0;
         hudLevel.textContent = (idx + 1) + '/' + LEVELS.length;
         levelNameFooter.textContent = tpl.name;
         hudScore.textContent = '0';
@@ -1276,6 +1303,21 @@
         for (const c of state.clouds) {
           c.x += c.speed * dt;
           if (c.x - c.rx > WORLD_W + 120) c.x = -c.rx - 120;
+        }
+
+        // Smooth Horizontal Camera Follow (keeps 1:1 proportions on mobile portrait & narrow screens)
+        const maxCamX = Math.max(0, WORLD_W - cam.viewW);
+        if (maxCamX > 0) {
+          if (state.mode === 'home' || state.mode === 'loading' || state.mode === 'level_select') {
+            const target = (Math.sin(state.time * 0.16) * 0.5 + 0.5) * maxCamX;
+            cam.x += (target - cam.x) * Math.min(1, dt * 2.5);
+          } else {
+            const lookAhead = state.player.facing * Math.min(70, cam.viewW * 0.14);
+            const target = Math.max(0, Math.min(maxCamX, state.player.x + lookAhead - cam.viewW * 0.45));
+            cam.x += (target - cam.x) * Math.min(1, dt * 6.5);
+          }
+        } else {
+          cam.x = 0;
         }
 
         if (state.mode !== 'playing') return;
@@ -1530,7 +1572,10 @@
           const sy = Math.cos(state.time * 61) * mag;
           ctx.translate(sx, sy);
         }
-        ctx.scale(scaleX, scaleY);
+        // Uniform camera transform: preserves exact 1:1 circular proportions on all phones & desktops
+        ctx.translate(0, cam.offsetY);
+        ctx.scale(cam.scale, cam.scale);
+        ctx.translate(-cam.x, 0);
 
         const skyGrad = ctx.createLinearGradient(0, 0, 0, GROUND_Y);
         skyGrad.addColorStop(0, tpl.skyTop);
@@ -1743,25 +1788,26 @@
         }
         ctx.globalAlpha = 1;
 
-        // Diegetic Warm-Orange Danger Vignette (mild in sunlight, pulsing below 30% energy)
+        ctx.restore();
+
+        // Screen-space Diegetic Warm-Orange Danger Vignette (always hugs actual screen edges)
         if (state.mode === 'playing' && (state.shadowSource === 'none' || state.energy < 30)) {
           const criticalFactor = state.energy < 30 ? (30 - state.energy) / 30 : 0;
           const pulse = 0.5 + 0.5 * Math.sin(state.time * (criticalFactor > 0 ? 8.5 : 3.5));
           const edgeAlpha = criticalFactor > 0
             ? 0.24 + criticalFactor * 0.36 + pulse * 0.14
             : 0.14 + pulse * 0.06;
+          const maxDim = Math.max(w, h);
           const vig = ctx.createRadialGradient(
-            WORLD_W * 0.5, WORLD_H * 0.5, WORLD_W * 0.26,
-            WORLD_W * 0.5, WORLD_H * 0.5, WORLD_W * 0.62
+            w * 0.5, h * 0.5, maxDim * 0.22,
+            w * 0.5, h * 0.5, maxDim * 0.62
           );
           vig.addColorStop(0, 'rgba(251, 146, 60, 0)');
           vig.addColorStop(0.7, `rgba(245, 158, 11, ${edgeAlpha * 0.45})`);
           vig.addColorStop(1, `rgba(234, 88, 12, ${edgeAlpha})`);
           ctx.fillStyle = vig;
-          ctx.fillRect(0, 0, WORLD_W, WORLD_H);
+          ctx.fillRect(0, 0, w, h);
         }
-
-        ctx.restore();
       }
 
       // --- Overlays ---
@@ -1837,8 +1883,15 @@
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = Math.max(320, Math.floor(rect.width * dpr));
         canvas.height = Math.max(240, Math.floor(rect.height * dpr));
-        scaleX = canvas.width / WORLD_W;
-        scaleY = canvas.height / WORLD_H;
+        // Uniform scale so circles/trees/characters NEVER stretch on mobile portrait or ultrawide
+        cam.scale = Math.max(canvas.width / WORLD_W, canvas.height / WORLD_H);
+        cam.viewW = canvas.width / cam.scale;
+        cam.viewH = canvas.height / cam.scale;
+        // Pin forest floor cleanly to bottom of viewport
+        cam.offsetY = canvas.height - WORLD_H * cam.scale;
+        const maxCamX = Math.max(0, WORLD_W - cam.viewW);
+        cam.x = Math.max(0, Math.min(maxCamX, state.player.x - cam.viewW * 0.45));
+        detectDeviceUI();
         render();
       }
 
@@ -1983,8 +2036,8 @@
         if (e.code === 'ArrowRight' || e.code === 'KeyD') setFacing(1);
       });
 
-      ctrlFaceLeft.addEventListener('click', () => { ensureSfxCtx(); setFacing(-1); });
-      ctrlFaceRight.addEventListener('click', () => { ensureSfxCtx(); setFacing(1); });
+      ctrlFaceLeft.addEventListener('pointerdown', (e) => { e.preventDefault(); ensureSfxCtx(); setFacing(-1); });
+      ctrlFaceRight.addEventListener('pointerdown', (e) => { e.preventDefault(); ensureSfxCtx(); setFacing(1); });
 
       window.addEventListener('resize', resizeCanvas);
 

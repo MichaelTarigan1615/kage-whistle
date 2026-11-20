@@ -441,6 +441,7 @@
           window.innerWidth < 768;
         mobileTouchControls.classList.toggle('hidden', !isTouch);
         desktopFacingHint.classList.toggle('hidden', isTouch);
+        return isTouch;
       }
 
       // --- 3 Atmospheric Forest Levels ---
@@ -1653,7 +1654,7 @@
         floorGrad.addColorStop(0, '#0f2620');
         floorGrad.addColorStop(1, '#050d0c');
         ctx.fillStyle = floorGrad;
-        ctx.fillRect(0, GROUND_Y, WORLD_W, WORLD_H - GROUND_Y);
+        ctx.fillRect(0, GROUND_Y, WORLD_W, WORLD_H - GROUND_Y + 420);
 
         ctx.strokeStyle = 'rgba(52, 211, 153, 0.26)';
         ctx.lineWidth = 1.6;
@@ -1883,15 +1884,18 @@
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = Math.max(320, Math.floor(rect.width * dpr));
         canvas.height = Math.max(240, Math.floor(rect.height * dpr));
+        const isTouch = detectDeviceUI();
+        // Reserve a clean dark earth zone at the bottom on touch devices so Kage & ground sit above the buttons
+        const bottomReserve = isTouch ? Math.round(92 * dpr) : 0;
+        const usableH = Math.max(200, canvas.height - bottomReserve);
         // Uniform scale so circles/trees/characters NEVER stretch on mobile portrait or ultrawide
-        cam.scale = Math.max(canvas.width / WORLD_W, canvas.height / WORLD_H);
+        cam.scale = Math.max(canvas.width / WORLD_W, usableH / WORLD_H);
         cam.viewW = canvas.width / cam.scale;
-        cam.viewH = canvas.height / cam.scale;
-        // Pin forest floor cleanly to bottom of viewport
-        cam.offsetY = canvas.height - WORLD_H * cam.scale;
+        cam.viewH = usableH / cam.scale;
+        // Pin forest floor cleanly above the bottom touch controls
+        cam.offsetY = usableH - WORLD_H * cam.scale;
         const maxCamX = Math.max(0, WORLD_W - cam.viewW);
         cam.x = Math.max(0, Math.min(maxCamX, state.player.x - cam.viewW * 0.45));
-        detectDeviceUI();
         render();
       }
 
